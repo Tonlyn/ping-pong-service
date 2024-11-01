@@ -1,0 +1,7 @@
+spring.application.name: pong-service
+
+server:
+  port: 8080
+
+logging.level.root: INFO
+#logging.file.name: logs/${spring.application.name}.log
