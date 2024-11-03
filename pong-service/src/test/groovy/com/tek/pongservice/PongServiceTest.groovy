@@ -1,13 +1,11 @@
 package com.tek.pongservice
 
 import com.tek.pongservice.constant.Constants
+import com.tek.pongservice.dto.PongRespDto
 import com.tek.pongservice.service.impl.PongServiceImpl
 import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
 import spock.lang.Specification
 import spock.lang.Title
-
-import java.util.concurrent.ConcurrentLinkedDeque
 
 @Title("PongServiceImpl Test")
 class PongServiceTest extends Specification {
@@ -22,31 +20,31 @@ class PongServiceTest extends Specification {
 
     def "test PongService.pong return 200"() {
         given:
-        def response = ResponseEntity.ok(Constants.PONG_RESP_CONTENT);
+        def message = "Hello"
+        def resp = new PongRespDto("" + HttpStatus.OK.value(), Constants.PONG_RESP_CONTENT)
 
         when:
-        def result = pongService.pong()
+        def result = pongService.pong(message).block()
 
         then:
-        result.statusCode == response.statusCode
-        result.body == response.body
+        result.getCode() == resp.getCode()
+        result.getMessage() == resp.getMessage()
     }
 
 
 
     def "test PongService.pong return 429"() {
         given:
-        //def bucket = Mock(ConcurrentLinkedDeque<Integer>)
-        def response = ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
-
+        def message = "Hello"
+        def resp = new PongRespDto("" + HttpStatus.TOO_MANY_REQUESTS.value())
 
         when:
-        def result1 = pongService.pong()
-        def result2 = pongService.pong()
+        def result1 = pongService.pong(message).block()
+        def result2 = pongService.pong(message).block()
 
         then:
-        result1.statusCode == HttpStatus.OK
-        result2.statusCode == HttpStatus.TOO_MANY_REQUESTS
+        result1.getCode() == "200"
+        result2.getCode() == "429"
     }
 
 

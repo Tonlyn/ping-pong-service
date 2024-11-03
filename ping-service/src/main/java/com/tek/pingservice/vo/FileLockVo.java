@@ -4,6 +4,12 @@ import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 
+/**
+ * File Lock Vo
+ *
+ * @author linshy
+ * @date 2024/10/30
+ */
 public class FileLockVo {
 
 

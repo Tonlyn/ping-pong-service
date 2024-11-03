@@ -1,8 +1,8 @@
 package com.tek.pingservice
 
+import com.tek.pingservice.task.PingTaskExecutor
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.web.client.RestTemplate
 import spock.lang.Specification
 import spock.lang.Title
 
@@ -11,11 +11,11 @@ import spock.lang.Title
 class PingServiceApplicationTest extends Specification {
 
     @Autowired
-    RestTemplate restTemplate;
+    PingTaskExecutor pingTaskExecutor;
 
-    def "test initial RestTemplate"() {
+    def "test initial PingTaskExecutor"() {
         expect:
-        restTemplate != null
+        pingTaskExecutor != null
     }
 
 

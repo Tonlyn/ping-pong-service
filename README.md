@@ -1,16 +1,26 @@
-# 程序运行步骤
+# Steps to run Ping Service And Pong Service
 
-## 1.编译打包
-将工程导入IDE（如IDEA）进行编译打包，确保ping-pong-service/ping-service、ping-pong-service/pong-service分别生成target目录，里面包含jar包、jacoco测试目录
+## 1 compile and package
+
+import ping-pong-service project into IDE(such as IDEA), then click to Maven Package, ensure there target folder generated under ping-pong-service/ping-service and ping-pong-service/pong-service, which contains jar and jacoco reports.
 
 
-## 1.执行运行脚本验证Ping-Pong服务
+## 2 run Ping-Pong-Service by shell
 
-### 启动pong-service
-在ping-pong-service根目录下，执行shell脚本，启动pong-service: ./start-pong-services.sh
+### 2.1 start pong-service
 
-### 启动ping-service
-在ping-pong-service根目录下，执行shell脚本，启动ping-service: ./start-ping-services.sh
+in root directory of ping-pong-service, to run the shell to start pong-service:
 
-### 查看运行日志
-进入ping-pong-service/logs目录，每个日志文件对应一个进程，打开文件查看各进程运行日志。
+./start-pong-services.sh
+
+
+### 2.2 start ping-service
+
+in root directory of ping-pong-service, to run the shell to start ping-service:
+
+./start-ping-services.sh
+
+### view running logs
+
+open the directory of ping-pong-service/logs, there are log files and each log file belongs to an instance.
+Open the log file to view running state of relative instance.

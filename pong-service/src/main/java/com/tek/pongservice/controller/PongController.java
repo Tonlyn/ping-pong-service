@@ -1,16 +1,22 @@
 package com.tek.pongservice.controller;
 
+import com.tek.pongservice.dto.PongRespDto;
 import com.tek.pongservice.service.IPongService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
+/**
+ * Pong Controller to expose RESTful API
+ *
+ * @author linshy
+ * @date 2024/10/30
+ */
 @RestController
 @RequestMapping("/pong")
 public class PongController {
@@ -24,8 +30,13 @@ public class PongController {
         this.pongService = pongService;
     }
 
+    /**
+     * Pong RESTful API: receive request for Ping Service
+     * @param message
+     * @return
+     */
     @PostMapping
-    public ResponseEntity<String> pong(@RequestBody String message) {
+    public Mono<PongRespDto> pong(@RequestBody String message) {
         return pongService.pong(message);
     }
 

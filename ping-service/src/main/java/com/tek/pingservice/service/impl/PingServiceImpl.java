@@ -8,14 +8,19 @@ import com.tek.pingservice.service.IPingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import java.io.IOException;
-
+/**
+ * Ping Service Implement class
+ *
+ * @author linshy
+ * @date 2024/10/30
+ */
 @Service
 public class PingServiceImpl extends AbstractLockHandler implements IPingService {
 
@@ -24,12 +29,12 @@ public class PingServiceImpl extends AbstractLockHandler implements IPingService
     @Autowired
     private ConfigValue configValue;
 
-    @Autowired
-    private RestTemplate restTemplate;
 
-    public PingServiceImpl(ConfigValue configValue, RestTemplate restTemplate) {
+    private final WebClient webClient;
+
+    public PingServiceImpl(ConfigValue configValue, WebClient.Builder webClientBuilder) {
         this.configValue = configValue;
-        this.restTemplate = restTemplate;
+        this.webClient = webClientBuilder.build();
     }
 
     @Override
@@ -37,86 +42,61 @@ public class PingServiceImpl extends AbstractLockHandler implements IPingService
         try {
             return handle();
         } catch (Exception e) {
-            logger.error("ping say Hello fail：" + e.getMessage());
+            logger.error(e.getMessage(), e);
             return Mono.just(new PingRespDto(Constants.DTO_RES_FAIL, e.getMessage()));
         }
-
     }
 
-    /*
-    private WebClient webClient() {
-        return WebClient.builder().build();
-    }*/
 
     @Override
     public Mono<PingRespDto> doBusiness() {
-        return invokeByRestTemplate();
+        return invokeByWebClient();
     }
 
 
-    private Mono<PingRespDto> invokeByRestTemplate() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.TEXT_PLAIN);
-        HttpEntity<String> entity = new HttpEntity<>(Constants.PING_SEND_CONTENT, headers);
-
-        ResponseEntity<String> response = restTemplate.exchange(configValue.PONG_SERVICE_URL, HttpMethod.POST, entity, String.class);
-        HttpStatusCode statusCode = response.getStatusCode();
-
-        String msg = "";
-        if (HttpStatus.OK.equals(statusCode)) {
-            logger.info("Request sent & Pong Respond.");
-            String result = response.getBody();
-            return Mono.just(new PingRespDto(Constants.DTO_RES_SUCCESS, result));
-        } else if (HttpStatus.TOO_MANY_REQUESTS == statusCode) {
-            msg = "Request sent & Pong throttled it.";
-            logger.warn(msg);
-            return Mono.just(new PingRespDto(Constants.DTO_RES_FAIL, msg));
-        } else {
-            msg = "Received unexpected response: " + statusCode;
-            logger.warn(msg);
-            return Mono.just(new PingRespDto(Constants.DTO_RES_FAIL, msg));
-        }
-    }
-
-    /*
+    /**
+     * to invoke Pong Service using webclient
+     * @return
+     */
     private Mono<PingRespDto> invokeByWebClient() {
-        return webClient().post()
-                .uri(configValue.pongServiceUrl)
+        return webClient.post()
+                .uri(configValue.PONG_SERVICE_URL)
                 .bodyValue(Constants.PING_SEND_CONTENT)
                 .exchangeToMono(this::handleResponse)
-                .doOnError(Exception.class, e -> {
-                    Mono.error(new Exception("Invoke Pong API Fail: " + e.getMessage()));
-                });
+                .onErrorReturn(new PingRespDto("", "webclient error"));
     }
 
 
+    /**
+     * response handler for webclient
+     * @param response
+     * @return
+     */
     private Mono<PingRespDto> handleResponse(ClientResponse response) {
+
         return response
-                .bodyToMono(String.class)
-                .flatMap(result -> {
+                .bodyToMono(PingRespDto.class)
+                .flatMap(dto -> {
 
-                    PingRespDto pingRespDto = new PingRespDto();
                     HttpStatusCode httpStatusCode = response.statusCode();
-                    String msg = "";
+                    String code = dto.getCode();
 
-                    if (httpStatusCode.is2xxSuccessful()) {
+                    if (code.equals("" + HttpStatus.OK.value())) {
                         logger.info("Request sent & Pong Respond.");
-                        pingRespDto.setCode(Constants.DTO_RES_SUCCESS);
-                        pingRespDto.setMessage(result);
-                    } else if (HttpStatus.TOO_MANY_REQUESTS.equals(httpStatusCode)) {
-                        msg = "Request sent & Pong throttled it.";
+                        return Mono.just(new PingRespDto(code, dto.getMessage()));
+
+                    } else if (code.equals("" + HttpStatus.TOO_MANY_REQUESTS.value())) {
+                        String msg = "Request sent & Pong throttled it.";
                         logger.warn(msg);
-                        pingRespDto.setCode(Constants.DTO_RES_FAIL);
-                        pingRespDto.setMessage(msg);
+                        return Mono.just(new PingRespDto(code, msg));
+
                     } else {
-                        msg = "Received unexpected response: " + httpStatusCode;
+                        String msg = "Received unexpected response: " + httpStatusCode.value();
                         logger.warn(msg);
-                        pingRespDto.setCode(Constants.DTO_RES_FAIL);
-                        pingRespDto.setMessage(msg);
+                        return Mono.just(new PingRespDto("" + httpStatusCode.value(), msg));
                     }
-                    return Mono.just(pingRespDto);
                 });
-    }*/
+    }
 
     @Override
     public String lockFail() {

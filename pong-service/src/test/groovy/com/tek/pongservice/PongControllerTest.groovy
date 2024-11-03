@@ -1,9 +1,11 @@
 package com.tek.pongservice
 
+import com.tek.pongservice.constant.Constants
 import com.tek.pongservice.controller.PongController
+import com.tek.pongservice.dto.PongRespDto
 import com.tek.pongservice.service.IPongService
 import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
+import reactor.core.publisher.Mono
 import spock.lang.Specification
 import spock.lang.Title
 
@@ -18,13 +20,16 @@ class PongControllerTest extends Specification{
     def "test PongController.pong"() {
         given:
         def message = "Hello"
-        def response = new ResponseEntity("World", HttpStatus.OK)
+        def pongRespDto = new PongRespDto();
+        pongRespDto.setCode("" + HttpStatus.OK.value());
+        pongRespDto.setMessage(Constants.PONG_RESP_CONTENT);
+        def resp = Mono.just(pongRespDto)
 
         when:
-        pongService.pong(message) >> response
+        pongService.pong(message) >> resp
 
         then:
-        def result = pongController.pong(message).body
+        def result = pongController.pong(message).block().getMessage()
         "World".equals(result)
     }
 }

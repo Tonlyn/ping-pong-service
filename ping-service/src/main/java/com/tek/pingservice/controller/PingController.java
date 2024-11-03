@@ -10,6 +10,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
+
+/**
+ * Ping Controller to expose RESTful API
+ *
+ * @author linshy
+ * @date 2024/10/30
+ */
 @RestController
 @RequestMapping("/ping")
 public class PingController {
@@ -23,6 +30,10 @@ public class PingController {
         this.pingService = pingService;
     }
 
+    /**
+     * Ping RESTful API: to say Hello to Pong Service
+     * @return
+     */
     @GetMapping("")
     public Mono<PingRespDto> ping() {
         return pingService.ping();
