@@ -3,6 +3,12 @@ package com.tek.pingservice.constant;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+/**
+ * Configuration from YAML File
+ *
+ * @author linshy
+ * @date 2024/10/30
+ */
 @Component
 public class ConfigValue {
 

@@ -1,14 +1,14 @@
-package com.tek.pingservice.dto;
+package com.tek.pongservice.dto;
 
 import java.io.Serializable;
 
 /**
- * Ping Response Dto
+ * Pong Response Dto
  *
  * @author linshy
  * @date 2024/10/30
  */
-public class PingRespDto implements Serializable {
+public class PongRespDto implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -16,13 +16,13 @@ public class PingRespDto implements Serializable {
 
     private String message;
 
-    public PingRespDto() {}
+    public PongRespDto() {}
 
-    public PingRespDto(String code) {
+    public PongRespDto(String code) {
         this.code = code;
     }
 
-    public PingRespDto(String code, String message) {
+    public PongRespDto(String code, String message) {
         this.code = code;
         this.message = message;
     }

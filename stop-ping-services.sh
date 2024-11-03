@@ -23,3 +23,4 @@ check_and_kill() {
 check_and_kill 8081
 check_and_kill 8082
 check_and_kill 8083
+check_and_kill 8084

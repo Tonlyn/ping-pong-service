@@ -14,12 +14,23 @@ import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 
+/**
+ * Abstract class of FileLock
+ *
+ * @author linshy
+ * @date 2024/10/30
+ */
 public abstract class AbstractLockHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractLockHandler.class);
 
 
-    public synchronized Mono<PingRespDto> handle() throws Exception {
+    /**
+     * send request to Pong Service with Rate Limit Control by FileLock
+     * @return
+     * @throws IOException
+     */
+    public synchronized Mono<PingRespDto> handle() throws IOException {
 
         //get file lock
         FileLockVo fileLockVo = getFileLock();
@@ -40,6 +51,11 @@ public abstract class AbstractLockHandler {
     }
 
 
+    /**
+     * get File Lock
+     * @return
+     * @throws IOException
+     */
     private synchronized FileLockVo getFileLock() throws IOException {
         RandomAccessFile randomAccessFile = null;
         FileChannel channel = null;
@@ -70,6 +86,12 @@ public abstract class AbstractLockHandler {
     }
 
 
+    /**
+     * create Lock File if file not exists
+     * @param configValue
+     * @param fullPath
+     * @throws IOException
+     */
     private synchronized void fileExists(ConfigValue configValue, String fullPath) throws IOException {
         File dirFile = new File(configValue.FILE_LOCK_DIR);
         if (!dirFile.exists()) {
@@ -81,6 +103,13 @@ public abstract class AbstractLockHandler {
         }
     }
 
+    /**
+     * release FileLock
+     * @param lock
+     * @param channel
+     * @param randomAccessFile
+     * @throws IOException
+     */
     private synchronized void close(FileLock lock, FileChannel channel, RandomAccessFile randomAccessFile) throws IOException {
         if (lock != null) {
             lock.release();
@@ -89,9 +118,21 @@ public abstract class AbstractLockHandler {
         randomAccessFile.close();
     }
 
+    /**
+     * doing something after get FileLock
+     * @return response of Pong Service
+     */
     public abstract Mono<PingRespDto> doBusiness();
 
+    /**
+     * doing something after fail to get FileLock
+     * @return
+     */
     public abstract String lockFail();
 
+    /**
+     * get Configuration for abstract class
+     * @return
+     */
     public abstract ConfigValue getConfigValue();
 }

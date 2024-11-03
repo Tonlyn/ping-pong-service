@@ -1,13 +1,21 @@
 package com.tek.pongservice.service.impl;
 
 import com.tek.pongservice.constant.Constants;
+import com.tek.pongservice.dto.PongRespDto;
 import com.tek.pongservice.ratelimiter.AbstractRateLimiter;
 import com.tek.pongservice.service.IPongService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
+/**
+ * Pong Service Implement class
+ *
+ * @author linshy
+ * @date 2024/10/30
+ */
 @Service
 public class PongServiceImpl extends AbstractRateLimiter implements IPongService {
 
@@ -15,13 +23,13 @@ public class PongServiceImpl extends AbstractRateLimiter implements IPongService
 
 
     @Override
-    public ResponseEntity<String> pong(String message) {
+    public Mono<PongRespDto> pong(String message) {
         return handleRequest();
     }
 
     @Override
-    public ResponseEntity<String> doBusiness() {
+    public Mono<PongRespDto> doBusiness() {
         logger.info("[" + Thread.currentThread().getName() +  "] Handling request & Responding with 'World'");
-        return ResponseEntity.ok(Constants.PONG_RESP_CONTENT);
+        return Mono.just(new PongRespDto("" + HttpStatus.OK.value(), Constants.PONG_RESP_CONTENT));
     }
 }

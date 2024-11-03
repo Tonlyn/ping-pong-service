@@ -1,5 +1,11 @@
 package com.tek.pingservice.constant;
 
+/**
+ * Ping Service Constants Class
+ *
+ * @author linshy
+ * @date 2024/10/30
+ */
 public class Constants {
 
     /**
