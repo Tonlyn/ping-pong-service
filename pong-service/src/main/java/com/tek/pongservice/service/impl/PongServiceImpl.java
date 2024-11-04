@@ -29,7 +29,7 @@ public class PongServiceImpl extends AbstractRateLimiter implements IPongService
 
     @Override
     public Mono<PongRespDto> doBusiness() {
-        logger.info("[" + Thread.currentThread().getName() +  "] Handling request & Responding with 'World'");
+        logger.info("[{}] Handling request & Responding with 'World'", Thread.currentThread().getName());
         return Mono.just(new PongRespDto("" + HttpStatus.OK.value(), Constants.PONG_RESP_CONTENT));
     }
 }

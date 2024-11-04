@@ -4,8 +4,6 @@ import com.tek.pingservice.constant.ConfigValue;
 import com.tek.pingservice.constant.Constants;
 import com.tek.pingservice.dto.PingRespDto;
 import com.tek.pingservice.vo.FileLockVo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
 
 import java.io.File;
@@ -21,8 +19,6 @@ import java.nio.channels.FileLock;
  * @date 2024/10/30
  */
 public abstract class AbstractLockHandler {
-
-    private static final Logger logger = LoggerFactory.getLogger(AbstractLockHandler.class);
 
 
     /**
@@ -61,7 +57,6 @@ public abstract class AbstractLockHandler {
         FileChannel channel = null;
         FileLock lock = null;
 
-        //ConfigValue configValue = (ConfigValue) ApplicationContextUtil.getBean(ConfigValue.class);
         ConfigValue configValue = getConfigValue();
 
         //文件锁路径

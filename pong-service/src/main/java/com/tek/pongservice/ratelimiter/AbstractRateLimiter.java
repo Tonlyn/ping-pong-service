@@ -27,7 +27,7 @@ public abstract class AbstractRateLimiter {
     private final ConcurrentLinkedDeque<Integer> bucket;
     private final ScheduledExecutorService scheduler;
 
-    public AbstractRateLimiter() {
+    protected AbstractRateLimiter() {
         // initial bucket
         this.bucket = new ConcurrentLinkedDeque<>();
         for (int i = 0; i < Constants.RATE_LIMIT_MAX_TOKEN; i++) {
@@ -41,7 +41,7 @@ public abstract class AbstractRateLimiter {
             if (bucket.size() < Constants.RATE_LIMIT_MAX_TOKEN) {
                 int i = token.incrementAndGet();
                 bucket.push(i);
-                logger.info("【定时任务】发放令牌：" + i);
+                logger.info("【定时任务】发放令牌：{}", i);
             }
         }, Constants.SCHEDULER_INITIAL_DELAY, Constants.SCHEDULER_PERIOD, TimeUnit.SECONDS);
     }
@@ -59,15 +59,14 @@ public abstract class AbstractRateLimiter {
             return doBusiness();
         } else {
             // 请求被丢弃
-            logger.warn("[" + Thread.currentThread().getName() + "] Too Many Requests, throttling it");
-            //return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(HttpStatus.TOO_MANY_REQUESTS.getReasonPhrase());
+            logger.warn("[{}] Too Many Requests, throttling it", Thread.currentThread().getName());
             return Mono.just(new PongRespDto("" + HttpStatus.TOO_MANY_REQUESTS.value(), HttpStatus.TOO_MANY_REQUESTS.getReasonPhrase()));
         }
     }
 
     /**
      * do somethging after get token
-     * @return
+     * @return response for Ping Service
      */
     public abstract Mono<PongRespDto> doBusiness();
 
